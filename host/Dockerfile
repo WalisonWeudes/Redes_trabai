@@ -1,5 +1,15 @@
-FROM python:3.12.6-slim 
-WORKDIR /app
-COPY host.py .
+FROM python:3.10-slim-bullseye
 
-CMD ["python","host.py"]
+RUN apt-get update && apt-get install -y \
+  iproute2 \
+  iputils-ping \
+  net-tools \
+  nano \
+  curl \
+  traceroute \
+  && rm -rf /var/lib/apt/lists/*
+
+COPY host.sh /host.sh 
+
+# Comando para executar o script Python ao iniciar o container
+CMD ["/host.sh"]

@@ -1,110 +1,46 @@
+version: "3"
 services:
-  host0_0:
-    build: ./host
+  roteador:
+    image: router_image
+    container_name: router1  # Nome do contêiner
+    environment:
+      - CONTAINER_NAME=router1  # Definindo a variável de ambiente
+    ports:
+      - "5000:5000"
     networks:
-      net_r0_h0:
-        ipv4_address: 192.168.1.10
-  host0_1:
-    build: ./host
-    networks:
-      net_r0_h1:
-        ipv4_address: 192.168.2.10
-  router0:
-    build: ./router
-    networks:
-      net_r0_h0:
-        ipv4_address: 192.168.1.1
-      net_r0_h1:
-        ipv4_address: 192.168.2.1
-      net_r0_r1:
-        ipv4_address: 10.1.0.1
-      net_r0_r2:
-        ipv4_address: 10.2.0.1
-  host1_0:
-    build: ./host
-    networks:
-      net_r1_h0:
-        ipv4_address: 192.168.3.10
-  host1_1:
-    build: ./host
-    networks:
-      net_r1_h1:
-        ipv4_address: 192.168.4.10
-  router1:
-    build: ./router
-    networks:
-      net_r1_h0:
-        ipv4_address: 192.168.3.1
-      net_r1_h1:
-        ipv4_address: 192.168.4.1
-      net_r0_r1:
-        ipv4_address: 10.1.0.2
-      net_r1_r2:
-        ipv4_address: 10.3.0.1
-  host2_0:
-    build: ./host
-    networks:
-      net_r2_h0:
-        ipv4_address: 192.168.5.10
-  host2_1:
-    build: ./host
-    networks:
-      net_r2_h1:
-        ipv4_address: 192.168.6.10
-  router2:
-    build: ./router
-    networks:
-      net_r2_h0:
-        ipv4_address: 192.168.5.1
-      net_r2_h1:
-        ipv4_address: 192.168.6.1
-      net_r0_r2:
-        ipv4_address: 10.2.0.2
-      net_r1_r2:
-        ipv4_address: 10.3.0.2
+      - rede
+
 networks:
-  net_r0_h0:
+  rede:
     driver: bridge
-    ipam:
-      config:
-      - subnet: 192.168.1.0/24
-  net_r0_h1:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 192.168.2.0/24
-  net_r1_h0:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 192.168.3.0/24
-  net_r1_h1:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 192.168.4.0/24
-  net_r2_h0:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 192.168.5.0/24
-  net_r2_h1:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 192.168.6.0/24
-  net_r0_r1:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 10.1.0.0/30
-  net_r0_r2:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 10.2.0.0/30
-  net_r1_r2:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 10.3.0.0/30
+    database:
+      image: postgres:latest
+      container_name: database1
+      environment:
+        POSTGRES_USER: user
+        POSTGRES_PASSWORD: password
+        POSTGRES_DB: mydatabase
+      ports:
+        - "5432:5432"
+      networks:
+        - rede
+
+    webserver:
+      image: nginx:latest
+      container_name: webserver1
+      ports:
+        - "8080:80"
+      networks:
+        - rede
+
+    app:
+      image: python:3.9-slim
+      container_name: app1
+      volumes:
+        - ./app:/usr/src/app
+      working_dir: /usr/src/app
+      command: python app.py
+      depends_on:
+        - database
+      networks:
+        - rede
