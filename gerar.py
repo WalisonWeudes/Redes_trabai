@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import csv
 
 # CONFIGURAÇÕES
-num_roteadores = 15
+num_roteadores = 4
 hosts_por_roteador = 2
 
 # Gerar grafo conectado com pesos'
@@ -23,7 +23,7 @@ subrede_base = 1
 pontoaponto_base = 1
 
 # CSV simplificado: Origem, Destino, Custo
-with open("router/conexoes_rede.csv", mode='w', newline='') as csvfile:
+with open("router/conex_rede.csv", mode='w', newline='') as csvfile:
     writer = csv.writer(csvfile)
     writer.writerow(['Origem', 'Destino', 'Custo'])
 
@@ -42,7 +42,7 @@ with open("router/conexoes_rede.csv", mode='w', newline='') as csvfile:
             # Host
             compose['services'][host_name] = {
                 'build': './host',
-                'container_name': host_name,
+                'HOSTNAME': host_name,
                 'cap_add': ['NET_ADMIN'],
                 'networks': {
                     net_name: {'ipv4_address': ip_host}
@@ -62,9 +62,9 @@ with open("router/conexoes_rede.csv", mode='w', newline='') as csvfile:
         # Roteador
         compose['services'][router_name] = {
             'build': './router',
-            'container_name': router_name,
+            'HOSTNAME': router_name,
             'environment': {
-                'CONTAINER_NAME': f"router{r+1}",
+                'HOSTNAME': f"router{r+1}",
             },
             'volumes': ['./router/router.py:/app/router.py'],
             'cap_add': ['NET_ADMIN'],

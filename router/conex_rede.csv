@@ -1,0 +1,13 @@
+Origem,Destino,Custo
+router1_host1,router1,-
+router1_host2,router1,-
+router2_host1,router2,-
+router2_host2,router2,-
+router3_host1,router3,-
+router3_host2,router3,-
+router4_host1,router4,-
+router4_host2,router4,-
+router1,router3,5
+router1,router2,1
+router2,router4,4
+router3,router4,7

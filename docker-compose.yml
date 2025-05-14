@@ -1,46 +1,199 @@
-version: "3"
+version: '3.8'
 services:
-  roteador:
-    image: router_image
-    container_name: router1  # Nome do contêiner
-    environment:
-      - CONTAINER_NAME=router1  # Definindo a variável de ambiente
-    ports:
-      - "5000:5000"
+  router1_host1:
+    build: ./host
+    HOSTNAME: router1_host1
+    cap_add:
+    - NET_ADMIN
     networks:
-      - rede
-
+      router1_host1_net:
+        ipv4_address: 192.168.1.2
+  router1_host2:
+    build: ./host
+    HOSTNAME: router1_host2
+    cap_add:
+    - NET_ADMIN
+    networks:
+      router1_host2_net:
+        ipv4_address: 192.168.2.2
+  router1:
+    build: ./router
+    HOSTNAME: router1
+    environment:
+      HOSTNAME: router1
+    volumes:
+    - ./router/router.py:/app/router.py
+    cap_add:
+    - NET_ADMIN
+    networks:
+      router1_host1_net:
+        ipv4_address: 192.168.1.10
+      router1_host2_net:
+        ipv4_address: 192.168.2.10
+      router1_router3_net:
+        ipv4_address: 10.10.1.10
+      router1_router2_net:
+        ipv4_address: 10.10.2.10
+  router2_host1:
+    build: ./host
+    HOSTNAME: router2_host1
+    cap_add:
+    - NET_ADMIN
+    networks:
+      router2_host1_net:
+        ipv4_address: 192.168.3.2
+  router2_host2:
+    build: ./host
+    HOSTNAME: router2_host2
+    cap_add:
+    - NET_ADMIN
+    networks:
+      router2_host2_net:
+        ipv4_address: 192.168.4.2
+  router2:
+    build: ./router
+    HOSTNAME: router2
+    environment:
+      HOSTNAME: router2
+    volumes:
+    - ./router/router.py:/app/router.py
+    cap_add:
+    - NET_ADMIN
+    networks:
+      router2_host1_net:
+        ipv4_address: 192.168.3.10
+      router2_host2_net:
+        ipv4_address: 192.168.4.10
+      router1_router2_net:
+        ipv4_address: 10.10.2.2
+      router2_router4_net:
+        ipv4_address: 10.10.3.10
+  router3_host1:
+    build: ./host
+    HOSTNAME: router3_host1
+    cap_add:
+    - NET_ADMIN
+    networks:
+      router3_host1_net:
+        ipv4_address: 192.168.5.2
+  router3_host2:
+    build: ./host
+    HOSTNAME: router3_host2
+    cap_add:
+    - NET_ADMIN
+    networks:
+      router3_host2_net:
+        ipv4_address: 192.168.6.2
+  router3:
+    build: ./router
+    HOSTNAME: router3
+    environment:
+      HOSTNAME: router3
+    volumes:
+    - ./router/router.py:/app/router.py
+    cap_add:
+    - NET_ADMIN
+    networks:
+      router3_host1_net:
+        ipv4_address: 192.168.5.10
+      router3_host2_net:
+        ipv4_address: 192.168.6.10
+      router1_router3_net:
+        ipv4_address: 10.10.1.2
+      router3_router4_net:
+        ipv4_address: 10.10.4.10
+  router4_host1:
+    build: ./host
+    HOSTNAME: router4_host1
+    cap_add:
+    - NET_ADMIN
+    networks:
+      router4_host1_net:
+        ipv4_address: 192.168.7.2
+  router4_host2:
+    build: ./host
+    HOSTNAME: router4_host2
+    cap_add:
+    - NET_ADMIN
+    networks:
+      router4_host2_net:
+        ipv4_address: 192.168.8.2
+  router4:
+    build: ./router
+    HOSTNAME: router4
+    environment:
+      HOSTNAME: router4
+    volumes:
+    - ./router/router.py:/app/router.py
+    cap_add:
+    - NET_ADMIN
+    networks:
+      router4_host1_net:
+        ipv4_address: 192.168.7.10
+      router4_host2_net:
+        ipv4_address: 192.168.8.10
+      router2_router4_net:
+        ipv4_address: 10.10.3.2
+      router3_router4_net:
+        ipv4_address: 10.10.4.2
 networks:
-  rede:
+  router1_host1_net:
     driver: bridge
-    database:
-      image: postgres:latest
-      container_name: database1
-      environment:
-        POSTGRES_USER: user
-        POSTGRES_PASSWORD: password
-        POSTGRES_DB: mydatabase
-      ports:
-        - "5432:5432"
-      networks:
-        - rede
-
-    webserver:
-      image: nginx:latest
-      container_name: webserver1
-      ports:
-        - "8080:80"
-      networks:
-        - rede
-
-    app:
-      image: python:3.9-slim
-      container_name: app1
-      volumes:
-        - ./app:/usr/src/app
-      working_dir: /usr/src/app
-      command: python app.py
-      depends_on:
-        - database
-      networks:
-        - rede
+    ipam:
+      config:
+      - subnet: 192.168.1.0/24
+  router1_host2_net:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 192.168.2.0/24
+  router2_host1_net:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 192.168.3.0/24
+  router2_host2_net:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 192.168.4.0/24
+  router3_host1_net:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 192.168.5.0/24
+  router3_host2_net:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 192.168.6.0/24
+  router4_host1_net:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 192.168.7.0/24
+  router4_host2_net:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 192.168.8.0/24
+  router1_router3_net:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 10.10.1.0/24
+  router1_router2_net:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 10.10.2.0/24
+  router2_router4_net:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 10.10.3.0/24
+  router3_router4_net:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 10.10.4.0/24
