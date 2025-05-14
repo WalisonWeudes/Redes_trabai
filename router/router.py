@@ -428,7 +428,7 @@ class Roteador:
 
 # Exemplo de uso
 if __name__ == "__main__":
-    router_id = os.getenv("HOSTNAME")
+    router_id = os.getenv("hostname")
     if not router_id:
         raise ValueError("NÃO ACHOU O NOME DO CONTAINER")
     

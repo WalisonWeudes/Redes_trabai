@@ -42,7 +42,7 @@ with open("router/conex_rede.csv", mode='w', newline='') as csvfile:
             # Host
             compose['services'][host_name] = {
                 'build': './host',
-                'HOSTNAME': host_name,
+                'hostname': host_name,
                 'cap_add': ['NET_ADMIN'],
                 'networks': {
                     net_name: {'ipv4_address': ip_host}
@@ -62,9 +62,9 @@ with open("router/conex_rede.csv", mode='w', newline='') as csvfile:
         # Roteador
         compose['services'][router_name] = {
             'build': './router',
-            'HOSTNAME': router_name,
+            'hostname': router_name,
             'environment': {
-                'HOSTNAME': f"router{r+1}",
+                'hostname': f"router{r+1}",
             },
             'volumes': ['./router/router.py:/app/router.py'],
             'cap_add': ['NET_ADMIN'],
