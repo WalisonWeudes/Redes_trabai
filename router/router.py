@@ -21,7 +21,7 @@ def carregar_grafo_com_pesos(csv_path):
             origem = linha['Origem']
             destino = linha['Destino']
             custo = linha['Custo']
-            custo = int(custo) if custo != '-' else 1  # Caso não haja custo, usa 1
+            custo = int(custo) if custo != '-' else 1
             G.add_edge(origem, destino, weight=custo)
     return G
 
@@ -30,12 +30,12 @@ class EstadoRoteador:
     """
     Gerencia a tabela de roteamento do roteador.
     """
-    __slots__ = ["_tabela_roteamento", "_id_rota", "_dados_vizinhos", "_roteamento"]
+    __slots__ = ["_tabela", "_id_rota", "_vizinhos", "_roteamento"]
 
     def __init__(self, id_rota: str, dados_vizinhos: dict[str, str]):
         self._id_rota = id_rota
-        self._tabela_roteamento = {}
-        self._dados_vizinhos = dados_vizinhos
+        self._tabela = {}
+        self._vizinhos = dados_vizinhos
         self._roteamento = {}
 
     def _criar_entrada_tabela(self, numero_seq, timestamp, enderecos, links):
@@ -58,22 +58,22 @@ class EstadoRoteador:
 
         print(f"Pacote recebido: {pacote}")
 
-        entrada = self._tabela_roteamento.get(id_rota)
+        entrada = self._tabela.get(id_rota)
         if entrada and numero_seq <= entrada["numero_sequencia"]:
-            print(f"Pacote ignorado (sequência antiga): {pacote}")
+            print(f"ignorado (antiga): {pacote}")
             return False
 
         print(f"Atualizando tabela de roteamento com id_rota {id_rota} e seq {numero_seq}")
-        self._tabela_roteamento[id_rota] = self._criar_entrada_tabela(
+        self._tabela[id_rota] = self._criar_entrada_tabela(
             numero_seq, pacote["timestamp"], pacote["enderecos"], pacote["links"]
         )
 
         for vizinho in pacote["links"].keys():
-            if vizinho not in self._tabela_roteamento:
-                print(f"Novo roteador descoberto: {vizinho}")
-                self._tabela_roteamento[vizinho] = self._criar_entrada_tabela(-1, 0, [], {})
+            if vizinho not in self._tabela:
+                print(f"Novo roteador: {vizinho}")
+                self._tabela[vizinho] = self._criar_entrada_tabela(-1, 0, [], {})
 
-        # CHAMADA DO ALGORITMO DE DIJKSTRA
+        #DIJKSTRA
         rotas = self._calcular_rotas_minimas()
         
         self._atualizar_roteamento(rotas)
@@ -84,13 +84,13 @@ class EstadoRoteador:
         """
         Calcula as rotas mínimas usando o algoritmo de Dijkstra.
         """
-        distancias = {n: float('inf') for n in self._tabela_roteamento}
-        anteriores = {n: None for n in self._tabela_roteamento}
+        distancias = {n: float('inf') for n in self._tabela}
+        anteriores = {n: None for n in self._tabela}
         visitados = set()
 
         distancias[self._id_rota] = 0
 
-        while len(visitados) < len(self._tabela_roteamento):
+        while len(visitados) < len(self._tabela):
             no_atual = min((n for n in distancias if n not in visitados),
                         key=lambda n: distancias[n], default=None)
 
@@ -98,7 +98,7 @@ class EstadoRoteador:
                 break
 
             visitados.add(no_atual)
-            vizinhos = self._tabela_roteamento[no_atual]["links"]
+            vizinhos = self._tabela[no_atual]["links"]
 
             for vizinho, custo in vizinhos.items():
                 if vizinho in visitados:
@@ -129,23 +129,23 @@ class EstadoRoteador:
         Aplica as rotas no sistema de rede.
         """
         print("Tabela de roteamento atual:")
-        for destino, dados in self._tabela_roteamento.items():
+        for destino, dados in self._tabela.items():
             print(f"  {destino}: {dados}")
         
         print("\nRotas calculadas:")
         for destino, gateway in self._roteamento.items():
             print(f"  {destino} -> {gateway}")
             
-            if gateway in self._dados_vizinhos:
-                ip_gateway = self._dados_vizinhos[gateway]
-                for ip_destino in self._tabela_roteamento[destino]["enderecos"]:
+            if gateway in self._vizinhos:
+                ip_gateway = self._vizinhos[gateway]
+                for ip_destino in self._tabela[destino]["enderecos"]:
                     print(f"  Aplicando rota: {ip_destino} via {ip_gateway}")
                     comando = ["ip", "route", "replace", ip_destino, "via", ip_gateway]
                     try:
                         subprocess.run(comando, check=True)
-                        print("    ✅ Sucesso")
+                        print("    Concluido")
                     except subprocess.CalledProcessError as e:
-                        print(f"    ❌ Falha: {e}")
+                        print(f"    Erro: {e}")
 
 # Função para obter interfaces com broadcast
 def obter_interfaces_com_broadcast():
@@ -398,7 +398,7 @@ class Roteador:
         
         print(f"[{self._router_id}] Recebido LSA de {id_emissor} (seq: {pacote['numero_sequencia']})")
         
-        entrada_atual = self._estado_roteador._tabela_roteamento.get(id_emissor, {})
+        entrada_atual = self._estado_roteador._tabela.get(id_emissor, {})
         seq_atual = entrada_atual.get("numero_sequencia", -1)
         seq_recebido = pacote["numero_sequencia"]
         
