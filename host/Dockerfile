@@ -1,4 +1,4 @@
-FROM python:3.10-slim-bullseye
+FROM debian:bookworm-slim
 
 RUN apt-get update && apt-get install -y \
   iproute2 \
@@ -11,5 +11,7 @@ RUN apt-get update && apt-get install -y \
 
 COPY host.sh /host.sh 
 
+RUN chmod +x /host.sh  
+
 # Comando para executar o script Python ao iniciar o container
-CMD ["/host.sh"]
+CMD ["./host.sh"]

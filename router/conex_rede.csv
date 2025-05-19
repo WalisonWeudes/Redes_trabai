@@ -7,7 +7,7 @@ router3_host1,router3,-
 router3_host2,router3,-
 router4_host1,router4,-
 router4_host2,router4,-
-router1,router4,2
-router1,router3,3
-router1,router2,3
-router2,router3,8
+router1,router3,8
+router1,router2,9
+router2,router4,2
+router3,router4,6
