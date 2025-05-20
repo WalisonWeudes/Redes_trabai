@@ -30,10 +30,12 @@ services:
         ipv4_address: 192.168.1.10
       router1_host2_net:
         ipv4_address: 192.168.2.10
-      router1_router3_net:
+      router1_router4_net:
         ipv4_address: 10.10.1.10
-      router1_router2_net:
+      router1_router3_net:
         ipv4_address: 10.10.2.10
+      router1_router2_net:
+        ipv4_address: 10.10.3.10
   router2_host1:
     build: ./host
     hostname: router2_host1
@@ -65,9 +67,9 @@ services:
       router2_host2_net:
         ipv4_address: 192.168.4.10
       router1_router2_net:
-        ipv4_address: 10.10.2.2
-      router2_router4_net:
-        ipv4_address: 10.10.3.10
+        ipv4_address: 10.10.3.2
+      router2_router3_net:
+        ipv4_address: 10.10.4.10
   router3_host1:
     build: ./host
     hostname: router3_host1
@@ -99,9 +101,9 @@ services:
       router3_host2_net:
         ipv4_address: 192.168.6.10
       router1_router3_net:
-        ipv4_address: 10.10.1.2
-      router3_router4_net:
-        ipv4_address: 10.10.4.10
+        ipv4_address: 10.10.2.2
+      router2_router3_net:
+        ipv4_address: 10.10.4.2
   router4_host1:
     build: ./host
     hostname: router4_host1
@@ -132,10 +134,8 @@ services:
         ipv4_address: 192.168.7.10
       router4_host2_net:
         ipv4_address: 192.168.8.10
-      router2_router4_net:
-        ipv4_address: 10.10.3.2
-      router3_router4_net:
-        ipv4_address: 10.10.4.2
+      router1_router4_net:
+        ipv4_address: 10.10.1.2
 networks:
   router1_host1_net:
     driver: bridge
@@ -177,22 +177,22 @@ networks:
     ipam:
       config:
       - subnet: 192.168.8.0/24
-  router1_router3_net:
+  router1_router4_net:
     driver: bridge
     ipam:
       config:
       - subnet: 10.10.1.0/24
-  router1_router2_net:
+  router1_router3_net:
     driver: bridge
     ipam:
       config:
       - subnet: 10.10.2.0/24
-  router2_router4_net:
+  router1_router2_net:
     driver: bridge
     ipam:
       config:
       - subnet: 10.10.3.0/24
-  router3_router4_net:
+  router2_router3_net:
     driver: bridge
     ipam:
       config:

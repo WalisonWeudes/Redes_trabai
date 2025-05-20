@@ -33,7 +33,7 @@ with open("router/conex_rede.csv", mode='w', newline='') as csvfile:
         router_networks = []
 
         for h in range(hosts_por_roteador):
-            host_name = f"{router_name}_host{h+1}"  # Nomenclatura ajustada para router01_host01, router01_host02, etc.
+            host_name = f"{router_name}_host{h+1}"  
             net_name = f"{router_name}_host{h+1}_net"
             subnet = f"192.168.{subrede_base}.0/24"
             ip_host = f"192.168.{subrede_base}.2"
